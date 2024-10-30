@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from database import SessionLocal, Buoy, Measurement
 from typing import Optional, List
 from sqlalchemy.exc import IntegrityError
-from models import BuoyCreate, MeasurementCreate, BuoyInfo, UserBuoysResponse, MeasurementData
+from models import BuoyCreate, MeasurementCreate, BuoyInfo, UserBuoysResponse
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -95,7 +95,7 @@ def get_user_buoys(user_id: int, token: str = Depends(get_current_token)):
         session.close()
 
 
-@app.post("/measurements/", response_model=List[MeasurementData])
+@app.post("/measurements/", response_model=List[MeasurementCreate])
 def get_measurements(
     serial_numbers: List[str] = Query(..., description="List of buoy serial numbers"),
     token: str = Depends(get_current_token)
@@ -110,7 +110,7 @@ def get_measurements(
             raise HTTPException(status_code=404, detail="No measurements found for the given criteria")
 
         result = [
-            MeasurementData(
+            MeasurementCreate(
                 buoy_serial_number=m.buoy_serial_number,
                 ambient_temp=m.ambient_temp,
                 water_temp=m.water_temp,
