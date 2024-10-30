@@ -4,9 +4,19 @@ from typing import Optional, List
 from sqlalchemy.exc import IntegrityError
 from models import BuoyCreate, MeasurementCreate, BuoyInfo, UserBuoysResponse, MeasurementData
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 API_TOKEN = "securetoken123"
 
@@ -88,16 +98,12 @@ def get_user_buoys(user_id: int, token: str = Depends(get_current_token)):
 @app.post("/measurements/", response_model=List[MeasurementData])
 def get_measurements(
     serial_numbers: List[str] = Query(..., description="List of buoy serial numbers"),
-    start_date: datetime = Query(..., description="Start date for data range"),
-    end_date: datetime = Query(..., description="End date for data range"),
     token: str = Depends(get_current_token)
 ):
     session = SessionLocal()
     try:
         measurements = session.query(Measurement).filter(
             Measurement.buoy_serial_number.in_(serial_numbers),
-            Measurement.timestamp >= start_date,
-            Measurement.timestamp <= end_date
         ).all()
 
         if not measurements:

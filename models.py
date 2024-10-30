@@ -29,12 +29,3 @@ class UserBuoysResponse(BaseModel):
     user_id: int
     buoys: List[BuoyInfo]
 
-class MeasurementData(BaseModel):
-    buoy_serial_number: str
-    ambient_temp: float
-    water_temp: float
-    water_pollution: float
-    humidity: float
-    lat: float
-    long: float
-    timestamp: datetime
